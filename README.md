@@ -26,7 +26,7 @@ Rules:
 
 Edge cases:
 - Allow propagate up even when blocked. ( A -> C, -g -> C, C -> g, therefore C -> g is disabled, but A -> g  is allowed.) If denying a higher user is intended, then that should be set explicitly.
-- It is possible to create cycles in the graph. There is no guarantee against doing so when modifying the graph to allow partial updates without locking the whole graph. By rule, vertices in a cycle will have the same set of permissions. Graph search algorithm must remember visited to avoid going in circles.
+- It is possible to create cycles in the graph. There is no guarantee against doing so when modifying the graph to allow partial updates without locking the whole graph. By rule, vertices in a cycle will have the same set of permissions. Graph search algorithms must remember visited to avoid going in circles.
 
 
 
@@ -63,10 +63,10 @@ Serialization from and to JOSN files will be how I provision and audit changes
 		}, {
 			"elevate": "-g",
 			"over": "Bob"
-		}],
+		}]
 	}]
 	
-The above is a concatenation of 2 files, supplied by users. Admin is a built-in all powerful account, it gives the control of g over to Alice. Alice also shares g with Bob using her first assignments. Notice that Alice also tries to disable g for Bob, but fails as Alice does not have control over Bob. In this contrived example, g end up controled by Admin, Alice, and Bob. If Admin also assigns Alice over Bob, then Bob will be blocked from g as deny rules have priority.
+The above is a concatenation of 2 files, supplied by users. Admin is a built-in all powerful account, it gives the control of g over to Alice. Alice also shares g with Bob using her first assignment. Notice that Alice also tries to disable g for Bob, but fails as Alice does not have control over Bob. In this contrived example, g end up controled by Admin, Alice, and Bob. If Admin also assigns Alice over Bob, then Bob will be blocked from g as deny rules have priority.
 
 ### Parameterized
 ![](http://g.gravizo.com/g?digraph G {
