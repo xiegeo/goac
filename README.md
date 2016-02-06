@@ -5,7 +5,7 @@ I need to replace a static user access control database file with something user
 
 ### How does control propagate in a graph?
 
-![](http://g.gravizo.com/g? digraph G {
+![example control graph, see raw .md file for DOT formate](http://g.gravizo.com/g? digraph G {
 	A [shape=box];B [shape=box];C [shape=box];D [shape=box];
 	A -> B ; A -> C ; "-g" -> C; 
 	B -> f;
@@ -40,7 +40,7 @@ It does not do:
 - Provisioning. This library should make it easy to do, but does not implement any network protocols itself.
 - Auditing. Again, just make it easy by exposing the right APIs.
 
-Serialization from and to JOSN files will be how I provision and audit changes
+Serialization from and to JSON files so that existing tools that provision and audit text files can be used.
 
 ## Capabilities / Users Sharing Permissions
 
@@ -69,15 +69,16 @@ Serialization from and to JOSN files will be how I provision and audit changes
 The above is a concatenation of 2 files, supplied by users. Admin is a built-in all powerful account, it gives the control of g over to Alice. Alice also shares g with Bob using her first assignment. Notice that Alice also tries to disable g for Bob, but fails as Alice does not have control over Bob. In this contrived example, g end up controled by Admin, Alice, and Bob. If Admin also assigns Alice over Bob, then Bob will be blocked from g as deny rules have priority.
 
 ### Parameterized
-![](http://g.gravizo.com/g?digraph G {
+![A -> B (p)](http://g.gravizo.com/g?digraph G {
 	node [shape=box];
     A -> B [label="p"];
 	{ rank=same; A B }
   }
 )
 
-"A -> B (p)"  means "A have control over p in B" or "permissions of A is a superset of the intersection between B and p" 
+"A -> B (p)"  means "A have control over p in B" or "permissions of A is a superset of the intersection between B and p". In parameterized assignments only the stated rules gets passed, this also means that B can have permissions that A does not have, and any deny rules over A does not also cover B.
 
+Only the following parameterization is currently planned for implementation:
 
 	{
 		"name": "Alice",
@@ -89,18 +90,42 @@ The above is a concatenation of 2 files, supplied by users. Admin is a built-in 
 				"appName": 2
 			}
 			"comments":{
-				"note":"grant service called appName on device g with level 2 access to Carol"
+				"note":"grant service called appName on server g with level 2 access to Carol"
 			}
 		}]
 	}
 	
-This style of parameterization is entended to work with access defined by levels (higher is more access) or feature sets (1 is allow).
+This style of parameterization is intended to work with access defined by levels (higher is more access) or feature sets (1 is allow, one name per feature).
 
-TODO...
-	
+### Usage
+![Shows an user request been authenticatied, then check by goAC, before the request is sent to app internals.](http://g.gravizo.com/g?
+actor User;
+participant "Authentication" as A;
+participant "goAC" as G;
+participant "App Internals" as I;
+User -> A: TLS protected request;
+activate A;
+A -> G: Request verified to User;
+activate G;
+G -> A: Allow or Deny request;
+deactivate G;
+A -> User: if Denied, return error;
+A -> I: if Allowed, send request;
+activate I;
+hide footbox;
+)
+
+TODO: go library API
+
+### User Self Serve Interface
+- Update user's JSON config file. A graphical user interface (GUI) that shows an editable graph is good to have.
+- A GUI that shows the user it's relevent subgraph, including allow and deny rules others have placed. It lets the user see and test who he have control over, and who among them can do what.
+
+The GUI will be an Ajax web app. It will start with JSON text file edit, and graph properties viewing by tables. Actural editable graphs will be expermented on later.
+
 ## Related Reading
 
-https://github.com/mikespook/gorbac (No self serve / permission sharing by users)
+https://github.com/mikespook/gorbac (no self serve, no permission sharing by users)
 
 https://en.wikipedia.org/wiki/Role-based_access_control
 
