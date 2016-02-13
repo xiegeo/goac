@@ -45,7 +45,7 @@ func TestGraph(t *testing.T) {
 		FullAssignment{Elevate: "", Over: "Z"}}})
 	if g.HavePath("A", "Z") {
 		t.Error("Empty string can't be assigned or used as an intermediary")
-		//even without this check, as long as admin don't assign "" over anythings,
+		//even without this check, as long as admin don't assign anything over "",
 		//no other user could misconfigure and cause harm with it.
 		//On the other hand, misspelling elevate and over...
 	}
