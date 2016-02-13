@@ -1,7 +1,7 @@
 package goac
 
 type CommentFeature struct {
-	Comments map[string]string
+	Comments map[string]string `json:"comments,omitempty"`
 }
 
 func (c *CommentFeature) GetAllComments() map[string]string {
@@ -12,12 +12,12 @@ func (c *CommentFeature) SetAllComments(cs map[string]string) {
 }
 
 type Vertex struct {
-	Name           string
-	FullAssigments []FullAssigment
+	Name            string           `json:"name,omitempty"`
+	FullAssignments []FullAssignment `json:"fullAssignments,omitempty"`
 }
 
-type FullAssigment struct {
+type FullAssignment struct {
 	CommentFeature
-	Elevate string
-	Over    string
+	Elevate string `json:"elevate,omitempty"`
+	Over    string `json:"over,omitempty"`
 }
