@@ -90,7 +90,7 @@ activate I;
 hide footbox;
 )
 
-TODO: go library API
+see [goac_test.go](goac_test.go) for examples
 
 ### User Self Serve Interface
 - Update user's JSON config file. A graphical user interface (GUI) that shows an editable graph is good to have.
