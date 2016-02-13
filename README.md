@@ -69,33 +69,8 @@ Serialization from and to JSON files so that existing tools that provision and a
 The above is a concatenation of 2 files, supplied by users. Admin is a built-in all powerful account, it gives the control of g over to Alice. Alice also shares g with Bob using her first assignment. Notice that Alice also tries to disable g for Bob, but fails as Alice does not have control over Bob. In this contrived example, g end up controled by Admin, Alice, and Bob. If Admin also assigns Alice over Bob, then Bob will be blocked from g as deny rules have priority.
 
 ### Parameterized
-![A -> B (p)](http://g.gravizo.com/g?digraph G {
-	node [shape=box];
-    A -> B [label="p"];
-	{ rank=same; A B }
-  }
-)
 
-"A -> B (p)"  means "A have control over p in B" or "permissions of A is a superset of the intersection between B and p". In parameterized assignments only the stated rules gets passed, this also means that B can have permissions that A does not have, and any deny rules over A does not also cover B.
-
-Only the following parameterization is currently planned for implementation:
-
-	{
-		"name": "Alice",
-		"assignments": [...],
-		"levels": [{
-			"elevate": "Carol",
-			"over": "g",
-			"level": {
-				"appName": 2
-			}
-			"comments":{
-				"note":"grant service called appName on server g with level 2 access to Carol"
-			}
-		}]
-	}
-	
-This style of parameterization is intended to work with access defined by levels (higher is more access) or feature sets (1 is allow, one name per feature).
+[See wiki](https://github.com/xiegeo/goac/wiki/Parameterized-Assignments)
 
 ### Usage
 ![Shows an user request been authenticatied, then check by goAC, before the request is sent to app internals.](http://g.gravizo.com/g?
