@@ -18,7 +18,7 @@ func NewGraph(admin string) *Graph {
 	g.SetVertex(Vertex{Name: "Void Vertex"}) //Protect against uncaught errors that return 0.
 	//This makes sure that all unfound vertexs would point to the Void Vertex.
 	//Which is also protected from being assigned power.
-	g.SetVertex(Vertex{Name: "admin"})
+	g.SetVertex(Vertex{Name: admin})
 	return g
 }
 
