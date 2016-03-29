@@ -1,5 +1,10 @@
 package goac
 
+import (
+	"encoding/json"
+	"io"
+)
+
 type CommentFeature struct {
 	Comments map[string]string `json:"comments,omitempty"`
 }
@@ -20,4 +25,20 @@ type FullAssignment struct {
 	CommentFeature
 	Elevate string `json:"elevate,omitempty"`
 	Over    string `json:"over,omitempty"`
+}
+
+func (v Vertex) EncodeJson(w io.Writer) error {
+	bs, err := json.MarshalIndent(v, "", "/t")
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(bs)
+	return err
+}
+
+func DecodeJsonToVertex(r io.Reader) (Vertex, error) {
+	v := Vertex{}
+	dec := json.NewDecoder(r)
+	err := dec.Decode(&v)
+	return v, err
 }
