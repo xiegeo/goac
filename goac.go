@@ -22,6 +22,14 @@ func NewGraph(admin string) *Graph {
 	return g
 }
 
+func (g *Graph) GetVertex(name string) *Vertex {
+	v, ok := g.byName[name]
+	if !ok {
+		return nil
+	}
+	return &g.vs[v]
+}
+
 func (g *Graph) SetVertex(v Vertex) {
 	if v.Name == "" {
 		return
