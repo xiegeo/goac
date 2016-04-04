@@ -116,3 +116,7 @@ func (g *Graph) HavePath(elevate, over string) bool {
 	}
 	return g.hasFullFrom.HavePath(e, o)
 }
+
+func (g *Graph) UseNegativeBuffer(b bool){
+	g.hasFullFrom.UseNegativeBuffer(b)
+}

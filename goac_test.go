@@ -7,7 +7,7 @@ import (
 
 func TestGraph(t *testing.T) {
 	g := NewGraph("admin")
-
+	g.UseNegativeBuffer(true)
 	if g.HavePath("admin", "A") {
 		t.Error("A does not yet exist")
 	}
@@ -58,5 +58,10 @@ func TestGraph(t *testing.T) {
 	}
 	bs, _ := json.Marshal(g.vs)
 	t.Log(string(bs))
+
+	g.rebuildTable()
+	if !g.hasFullFrom.negativeBuffer {
+		t.Error("negativeBuffer should not be reset")
+	}
 
 }
