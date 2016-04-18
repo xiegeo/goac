@@ -6,13 +6,13 @@ import (
 )
 
 type Vertex struct {
-	Name            string           `json:"name,omitempty"`
+	Name            Name             `json:"name,omitempty"`
 	FullAssignments []FullAssignment `json:"fullAssignments,omitempty"`
 }
 
 type FullAssignment struct {
-	Elevate  string            `json:"elevate,omitempty"`
-	Over     string            `json:"over,omitempty"`
+	Elevate  Name              `json:"elevate,omitempty"`
+	Over     Name              `json:"over,omitempty"`
 	Comments map[string]string `json:"comments,omitempty"`
 }
 

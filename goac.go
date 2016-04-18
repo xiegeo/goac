@@ -1,19 +1,24 @@
 package goac
 
+//Name denotes a string that has been normalized and unambiguous to use as graph
+//vertex identifier. This cast should be made by user code that moves data into
+//graphs.
+type Name string
+
 type Graph struct {
-	admin           string
+	admin           Name
 	vs              []Vertex
-	byName          map[string]VertexRef
+	byName          map[Name]VertexRef
 	hasFullFrom     vertexRefTable
 	refTableIsValid bool
 }
 
 type VertexRef int
 
-func NewGraph(admin string) *Graph {
+func NewGraph(admin Name) *Graph {
 	g := &Graph{
 		admin:  admin,
-		byName: make(map[string]VertexRef),
+		byName: make(map[Name]VertexRef),
 	}
 	g.SetVertex(Vertex{Name: "Void Vertex"}) //Protect against uncaught errors that return 0.
 	//This makes sure that all unfound vertexs would point to the Void Vertex.
@@ -22,7 +27,7 @@ func NewGraph(admin string) *Graph {
 	return g
 }
 
-func (g *Graph) GetVertex(name string) *Vertex {
+func (g *Graph) GetVertex(name Name) *Vertex {
 	v, ok := g.byName[name]
 	if !ok {
 		return nil
@@ -102,7 +107,7 @@ func (g *Graph) rebuildTable() {
 	g.refTableIsValid = true
 }
 
-func (g *Graph) HavePath(elevate, over string) bool {
+func (g *Graph) HavePath(elevate, over Name) bool {
 	if !g.refTableIsValid {
 		g.rebuildTable()
 	}
@@ -117,6 +122,6 @@ func (g *Graph) HavePath(elevate, over string) bool {
 	return g.hasFullFrom.HavePath(e, o)
 }
 
-func (g *Graph) UseNegativeBuffer(b bool){
+func (g *Graph) UseNegativeBuffer(b bool) {
 	g.hasFullFrom.UseNegativeBuffer(b)
 }
