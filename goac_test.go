@@ -65,3 +65,18 @@ func TestGraph(t *testing.T) {
 	}
 
 }
+
+func TestSuperAdmin(t *testing.T) {
+	g := NewGraph("admin")
+	g.UseNegativeBuffer(true)
+	g.SetVertex(Vertex{Name: "A"})
+	if !g.HavePath("admin", "A") {
+		t.Error("admin sould always have power")
+	}
+	g.SetVertex(Vertex{Name: "admin", FullAssignments: []FullAssignment{
+		FullAssignment{Elevate: "super", Over: "admin"}}})
+	if !g.HavePath("super", "A") {
+		t.Log(g)
+		t.Error("super should have power given by admin")
+	}
+}

@@ -72,6 +72,7 @@ func (g *Graph) rebuildTable() {
 		}
 	}
 	triples := [][3]VertexRef{}
+	adminRef := g.byName[g.admin]
 	for _, v := range g.vs {
 		if v.Name != g.admin {
 			p := g.byName[v.Name]
@@ -83,6 +84,8 @@ func (g *Graph) rebuildTable() {
 					triples = append(triples, [3]VertexRef{p, e, g.byName[a.Over]})
 				}
 			}
+			//all refs are also controlled by admin
+			g.hasFullFrom.Set(adminRef, p)
 		}
 	}
 	if len(triples) != 0 {
@@ -115,9 +118,6 @@ func (g *Graph) HavePath(elevate, over Name) bool {
 	o, ok2 := g.byName[over]
 	if !ok || !ok2 {
 		return false
-	}
-	if elevate == g.admin {
-		return true
 	}
 	return g.hasFullFrom.HavePath(e, o)
 }
