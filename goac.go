@@ -1,5 +1,9 @@
 package goac
 
+import (
+	"fmt"
+)
+
 //Name denotes a string that has been normalized and unambiguous to use as graph
 //vertex identifier. This cast should be made by user code that moves data into
 //graphs.
@@ -111,15 +115,23 @@ func (g *Graph) rebuildTable() {
 }
 
 func (g *Graph) HavePath(elevate, over Name) bool {
+	b, _ := g.HavePathDebug(elevate, over)
+	return b
+}
+
+func (g *Graph) HavePathDebug(elevate, over Name) (bool, error) {
 	if !g.refTableIsValid {
 		g.rebuildTable()
 	}
 	e, ok := g.byName[elevate]
-	o, ok2 := g.byName[over]
-	if !ok || !ok2 {
-		return false
+	if !ok {
+		return false, fmt.Errorf("%v is not in graph", elevate)
 	}
-	return g.hasFullFrom.HavePath(e, o)
+	o, ok2 := g.byName[over]
+	if !ok2 {
+		return false, fmt.Errorf("%v is not in graph", over)
+	}
+	return g.hasFullFrom.HavePath(e, o), nil
 }
 
 func (g *Graph) UseNegativeBuffer(b bool) {
