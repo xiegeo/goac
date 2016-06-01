@@ -30,6 +30,7 @@ func TestGraph(t *testing.T) {
 	if g.HavePath("A", "B") {
 		t.Error("A can't just self assign")
 	}
+	g.UseNegativeBuffer(false)
 	g.SetVertex(Vertex{Name: "admin", FullAssignments: []FullAssignment{
 		FullAssignment{Elevate: "A", Over: "B"}}})
 	if !g.HavePath("A", "B") {
@@ -40,6 +41,7 @@ func TestGraph(t *testing.T) {
 	if !g.HavePath("C", "B") {
 		t.Error("A shoud be able to share B")
 	}
+	g.UseNegativeBuffer(true)
 	g.SetVertex(Vertex{Name: "admin", FullAssignments: []FullAssignment{
 		FullAssignment{Elevate: "A", Over: ""},
 		FullAssignment{Elevate: "", Over: "Z"}}})
@@ -68,7 +70,6 @@ func TestGraph(t *testing.T) {
 
 func TestSuperAdmin(t *testing.T) {
 	g := NewGraph("admin")
-	g.UseNegativeBuffer(true)
 	g.SetVertex(Vertex{Name: "A"})
 	if !g.HavePath("admin", "A") {
 		t.Error("admin sould always have power")
