@@ -5,14 +5,14 @@ I need to replace a static user access control database file with something user
 
 ### How does control propagate in a graph?
 
-![example control graph, see raw .md file for DOT formate](http://g.gravizo.com/g? digraph G {
+![digraph G {
 	A [shape=box];B [shape=box];C [shape=box];D [shape=box];
 	A -> B ; A -> C ; "-g" -> C; 
 	B -> f;
 	C -> D; D -> g[style=dotted];
 	A -> f [color=blue]; A -> g [color=blue]; 
 	C -> g [color=blue,style=dotted];
-})
+}](http://g.gravizo.com/svg?digraph%20G%20%7B%0A%09A%20%5Bshape%3Dbox%5D%3BB%20%5Bshape%3Dbox%5D%3BC%20%5Bshape%3Dbox%5D%3BD%20%5Bshape%3Dbox%5D%3B%0A%09A%20-%3E%20B%20%3B%20A%20-%3E%20C%20%3B%20%22-g%22%20-%3E%20C%3B%20%0A%09B%20-%3E%20f%3B%0A%09C%20-%3E%20D%3B%20D%20-%3E%20g%5Bstyle%3Ddotted%5D%3B%0A%09A%20-%3E%20f%20%5Bcolor%3Dblue%5D%3B%20A%20-%3E%20g%20%5Bcolor%3Dblue%5D%3B%20%0A%09C%20-%3E%20g%20%5Bcolor%3Dblue%2Cstyle%3Ddotted%5D%3B)
 
 Vertices A, B, C, and D are users; f and g are allowed actions; and -g (not g) denies access to g. Black arrows are explicit permission assignments, and blue arrows are derived (not all shown). Dotted arrows are disabled (by -g). 
 
@@ -73,8 +73,7 @@ The above is a concatenation of 2 files, supplied by users. Admin is a built-in 
 [See wiki](https://github.com/xiegeo/goac/wiki/Parameterized-Assignments)
 
 ### Usage
-![Shows an user request been authenticatied, then check by goAC, before the request is sent to app internals.](http://g.gravizo.com/g?
-actor User;
+![actor User;
 participant "Authentication" as A;
 participant "goAC" as G;
 participant "App Internals" as I;
@@ -87,7 +86,7 @@ deactivate G;
 A -> User: if Denied, return error;
 A -> I: if Allowed, send request;
 activate I;
-hide footbox;
+hide footbox;](http://g.gravizo.com/svg?actor%20User%3B%0Aparticipant%20%22Authentication%22%20as%20A%3B%0Aparticipant%20%22goAC%22%20as%20G%3B%0Aparticipant%20%22App%20Internals%22%20as%20I%3B%0AUser%20-%3E%20A%3A%20TLS%20protected%20request%3B%0Aactivate%20A%3B%0AA%20-%3E%20G%3A%20Request%20verified%20to%20User%3B%0Aactivate%20G%3B%0AG%20-%3E%20A%3A%20Allow%20or%20Deny%20request%3B%0Adeactivate%20G%3B%0AA%20-%3E%20User%3A%20if%20Denied%2C%20return%20error%3B%0AA%20-%3E%20I%3A%20if%20Allowed%2C%20send%20request%3B%0Aactivate%20I%3B%0Ahide%20footbox%3B
 )
 
 see [goac_test.go](goac_test.go) for examples
