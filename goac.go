@@ -2,6 +2,7 @@ package goac
 
 import (
 	"fmt"
+	"sync"
 )
 
 //Name denotes a string that has been normalized and unambiguous to use as graph
@@ -10,11 +11,12 @@ import (
 type Name string
 
 type Graph struct {
-	admin           Name
-	vs              []Vertex
-	byName          map[Name]VertexRef
-	hasFullFrom     vertexRefTable
-	refTableIsValid bool
+	admin         Name
+	vs            []Vertex
+	byName        map[Name]VertexRef
+	hasFullFrom   vertexRefTable
+	buildRefTable *sync.Once
+	resetLock     sync.RWMutex
 }
 
 type VertexRef int
@@ -25,10 +27,16 @@ func NewGraph(admin Name) *Graph {
 		byName: make(map[Name]VertexRef),
 	}
 	g.SetVertex(Vertex{Name: "Void Vertex"}) //Protect against uncaught errors that return 0.
-	//This makes sure that all unfound vertexs would point to the Void Vertex.
+	//This makes sure that all not found vertexes will point to the Void Vertex.
 	//Which is also protected from being assigned power.
 	g.SetVertex(Vertex{Name: admin})
 	return g
+}
+
+func (g *Graph) resetBuildRefTable() {
+	g.resetLock.Lock()
+	g.buildRefTable = &sync.Once{}
+	g.resetLock.Unlock()
 }
 
 func (g *Graph) GetVertex(name Name) *Vertex {
@@ -61,7 +69,7 @@ func (g *Graph) SetVertex(v Vertex) {
 			g.SetVertex(Vertex{Name: a.Over})
 		}
 	}
-	g.refTableIsValid = false
+	g.resetBuildRefTable()
 }
 
 func (g *Graph) rebuildTable() {
@@ -111,29 +119,36 @@ func (g *Graph) rebuildTable() {
 			i = (i + 1) % len(triples)
 		}
 	}
-	g.refTableIsValid = true
 }
 
+//HavePath tests if elevate node is above the over node.
 func (g *Graph) HavePath(elevate, over Name) bool {
 	b, _ := g.HavePathDebug(elevate, over)
 	return b
 }
 
+//HavePathDebug is HavePath with extra error information
 func (g *Graph) HavePathDebug(elevate, over Name) (bool, error) {
-	if !g.refTableIsValid {
-		g.rebuildTable()
-	}
+	g.resetLock.RLock()
+	g.buildRefTable.Do(g.rebuildTable)
+
 	e, ok := g.byName[elevate]
 	if !ok {
+		g.resetLock.RUnlock()
 		return false, fmt.Errorf("%v is not in graph", elevate)
 	}
 	o, ok2 := g.byName[over]
 	if !ok2 {
+		g.resetLock.RUnlock()
 		return false, fmt.Errorf("%v is not in graph", over)
 	}
-	return g.hasFullFrom.HavePath(e, o), nil
+	havePath := g.hasFullFrom.HavePath(e, o)
+	g.resetLock.RUnlock()
+	return havePath, nil
 }
 
 func (g *Graph) UseNegativeBuffer(b bool) {
+	g.resetLock.Lock()
 	g.hasFullFrom.UseNegativeBuffer(b)
+	g.resetLock.Unlock()
 }

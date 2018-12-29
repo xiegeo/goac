@@ -8,6 +8,9 @@ import (
 func TestGraph(t *testing.T) {
 	g := NewGraph("admin")
 	g.UseNegativeBuffer(true)
+	if g.GetVertex("A") != nil {
+		t.Error("A does not yet exist")
+	}
 	if g.HavePath("admin", "A") {
 		t.Error("A does not yet exist")
 	}
@@ -15,6 +18,9 @@ func TestGraph(t *testing.T) {
 		t.Error("A does not yet exist")
 	}
 	g.SetVertex(Vertex{Name: "A"})
+	if g.GetVertex("A") == nil {
+		t.Error("A should have been created")
+	}
 	if !g.HavePath("admin", "A") {
 		t.Error("admin should have power over all")
 	}
@@ -39,7 +45,7 @@ func TestGraph(t *testing.T) {
 	g.SetVertex(Vertex{Name: "A", FullAssignments: []FullAssignment{
 		FullAssignment{Elevate: "C", Over: "B"}}})
 	if !g.HavePath("C", "B") {
-		t.Error("A shoud be able to share B")
+		t.Error("A should be able to share B")
 	}
 	g.UseNegativeBuffer(true)
 	g.SetVertex(Vertex{Name: "admin", FullAssignments: []FullAssignment{
@@ -72,7 +78,7 @@ func TestSuperAdmin(t *testing.T) {
 	g := NewGraph("admin")
 	g.SetVertex(Vertex{Name: "A"})
 	if !g.HavePath("admin", "A") {
-		t.Error("admin sould always have power")
+		t.Error("admin should always have power")
 	}
 	g.SetVertex(Vertex{Name: "admin", FullAssignments: []FullAssignment{
 		FullAssignment{Elevate: "super", Over: "admin"}}})

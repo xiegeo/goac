@@ -31,7 +31,7 @@ func TestVertexJSON(t *testing.T) {
 	]
 }`
 	buf := bytes.NewBuffer(nil)
-	v.EncodeJson(buf)
+	_ = v.EncodeJson(buf)
 	if json != buf.String() {
 		t.Fatalf("encode not expected:%v", buf.String())
 	}
