@@ -16,7 +16,7 @@ type Graph struct {
 	byName        map[Name]VertexRef
 	hasFullFrom   vertexRefTable
 	buildRefTable *sync.Once
-	resetLock     sync.RWMutex
+	lock          sync.RWMutex
 }
 
 type VertexRef int
@@ -34,23 +34,26 @@ func NewGraph(admin Name) *Graph {
 }
 
 func (g *Graph) resetBuildRefTable() {
-	g.resetLock.Lock()
 	g.buildRefTable = &sync.Once{}
-	g.resetLock.Unlock()
 }
 
 func (g *Graph) GetVertex(name Name) *Vertex {
+	g.lock.RLock()
 	v, ok := g.byName[name]
 	if !ok {
+		g.lock.RUnlock()
 		return nil
 	}
-	return &g.vs[v]
+	out := &g.vs[v]
+	g.lock.RUnlock()
+	return out
 }
 
 func (g *Graph) SetVertex(v Vertex) {
 	if v.Name == "" {
 		return
 	}
+	g.lock.Lock()
 	ref, ok := g.byName[v.Name]
 	if !ok {
 		ref = VertexRef(len(g.vs))
@@ -62,14 +65,19 @@ func (g *Graph) SetVertex(v Vertex) {
 	for _, a := range v.FullAssignments {
 		_, ok := g.byName[a.Elevate]
 		if !ok {
+			g.lock.Unlock()
 			g.SetVertex(Vertex{Name: a.Elevate})
+			g.lock.Lock()
 		}
 		_, ok = g.byName[a.Over]
 		if !ok {
+			g.lock.Unlock()
 			g.SetVertex(Vertex{Name: a.Over})
+			g.lock.Lock()
 		}
 	}
 	g.resetBuildRefTable()
+	g.lock.Unlock()
 }
 
 func (g *Graph) rebuildTable() {
@@ -129,26 +137,26 @@ func (g *Graph) HavePath(elevate, over Name) bool {
 
 //HavePathDebug is HavePath with extra error information
 func (g *Graph) HavePathDebug(elevate, over Name) (bool, error) {
-	g.resetLock.RLock()
+	g.lock.RLock()
 	g.buildRefTable.Do(g.rebuildTable)
 
 	e, ok := g.byName[elevate]
 	if !ok {
-		g.resetLock.RUnlock()
+		g.lock.RUnlock()
 		return false, fmt.Errorf("%v is not in graph", elevate)
 	}
 	o, ok2 := g.byName[over]
 	if !ok2 {
-		g.resetLock.RUnlock()
+		g.lock.RUnlock()
 		return false, fmt.Errorf("%v is not in graph", over)
 	}
 	havePath := g.hasFullFrom.HavePath(e, o)
-	g.resetLock.RUnlock()
+	g.lock.RUnlock()
 	return havePath, nil
 }
 
 func (g *Graph) UseNegativeBuffer(b bool) {
-	g.resetLock.Lock()
+	g.lock.Lock()
 	g.hasFullFrom.UseNegativeBuffer(b)
-	g.resetLock.Unlock()
+	g.lock.Unlock()
 }
